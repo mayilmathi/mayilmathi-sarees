@@ -39,13 +39,11 @@
 
     grid.innerHTML = filtered.map((item, i) => {
       const tag = tagFor(Number(item.qty) || 0);
-      const img = resolveImageUrl(item.image || (item.code + '.jpg'));
       return `
       <article class="stock-card" style="animation-delay:${i * 45}ms;">
         <div class="thumb">
           <span class="avail-tag ${tag.cls}">${tag.label}</span>
-          <img src="${img}" alt="Saree ${escapeHtml(item.code)}" loading="lazy"
-               onerror="this.closest('.thumb').style.background='linear-gradient(135deg,var(--peacock),var(--midnight))'; this.style.display='none';">
+          <img data-img-source="${escapeHtml(item.image || item.code)}" alt="Saree ${escapeHtml(item.code)}" loading="lazy">
         </div>
         <div class="body">
           <span class="code">${escapeHtml(item.code)}</span>
@@ -57,6 +55,10 @@
         </div>
       </article>`;
     }).join('');
+
+    grid.querySelectorAll('img[data-img-source]').forEach(img => {
+      setupImageFallback(img, img.dataset.imgSource);
+    });
   }
 
   function escapeHtml(str){
