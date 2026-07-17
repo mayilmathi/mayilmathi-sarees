@@ -10,7 +10,7 @@
 
 const CONFIG = {
   // Your deployed Google Apps Script Web App URL
-  API_URL: "https://script.google.com/macros/s/AKfycbyxjnTwZxXRNQctuRvvmVQMw6rYrOXcS42We_yeDvScFLRwrbTaCl2fZbzDcft4wyyS/exec",
+  API_URL: "https://script.google.com/macros/s/AKfycbz1Pa2Za5ww7Nf0JUaqYoXyBCgNBBKKFqkd2_aZUWI8rL5EWSR6Zc4dTnM0jqFGzFPY/exec", 
 
   // Where saree photos are hosted on GitHub (raw file base URL, trailing slash)
   IMAGE_BASE_URL: "https://raw.githubusercontent.com/mayilmathi/mayilmathi-sarees/main/images/sarees/",
