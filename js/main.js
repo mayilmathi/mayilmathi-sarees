@@ -114,3 +114,58 @@ function resolveImageUrl(filename){
   if (/^https?:\/\//i.test(filename)) return filename;
   return CONFIG.IMAGE_BASE_URL + filename;
 }
+
+/* ============================================================
+   Image fallback chain — tries several common extensions so a
+   sheet that just says "SE_01" (no extension) still finds the
+   photo whether it's actually SE_01.jpg, .jpeg, .png or .webp.
+   If an explicit filename with an extension is given, that is
+   tried first; if it 404s, the other extensions are still tried
+   as a safety net.
+============================================================ */
+const IMAGE_FALLBACK_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'PNG'];
+
+function buildImageCandidates(codeOrValue){
+  const raw = String(codeOrValue || '').trim();
+  if (!raw) return [];
+  if (/^https?:\/\//i.test(raw)) return [raw];
+
+  const hasExtension = /\.[a-zA-Z0-9]{3,4}$/.test(raw);
+  const base = hasExtension ? raw.replace(/\.[a-zA-Z0-9]{3,4}$/, '') : raw;
+  const candidates = [];
+
+  if (hasExtension) candidates.push(CONFIG.IMAGE_BASE_URL + raw); // explicit filename first
+  IMAGE_FALLBACK_EXTENSIONS.forEach(ext => {
+    candidates.push(CONFIG.IMAGE_BASE_URL + base + '.' + ext);
+  });
+  return [...new Set(candidates)];
+}
+
+// Attach this to an <img>'s onerror to walk through candidates,
+// then fall back to a soft peacock-gradient placeholder.
+function setupImageFallback(imgEl, codeOrValue){
+  const candidates = buildImageCandidates(codeOrValue);
+  if (!candidates.length){
+    hideToPlaceholder_(imgEl);
+    return;
+  }
+  imgEl.dataset.candidateIdx = '0';
+  imgEl.src = candidates[0];
+  imgEl.onerror = function(){
+    const idx = Number(imgEl.dataset.candidateIdx || '0') + 1;
+    if (idx < candidates.length){
+      imgEl.dataset.candidateIdx = String(idx);
+      imgEl.src = candidates[idx];
+    } else {
+      hideToPlaceholder_(imgEl);
+    }
+  };
+}
+
+function hideToPlaceholder_(imgEl){
+  imgEl.onerror = null;
+  imgEl.style.display = 'none';
+  const wrap = imgEl.closest('.thumb');
+  if (wrap) wrap.style.background = 'linear-gradient(135deg,var(--peacock),var(--midnight))';
+}
+
