@@ -3,6 +3,11 @@
    Requires BOTH the exact Order ID and the last 4 mobile digits
    to match before anything is shown. See apps-script/Code.gs
    (action=track) for the matching server-side check.
+
+   Feedback add/edit re-sends the same Order ID + phone4 with the
+   write request, and the server re-verifies that match against
+   the sheet before saving anything — see submitFeedback_ in
+   apps-script/Code.gs.
 ============================================================ */
 (function(){
   const form = document.getElementById('trackForm');
@@ -10,6 +15,10 @@
   const resultsBox = document.getElementById('orderResults');
   const submitBtn = document.getElementById('trackSubmit');
   document.getElementById('repoLink').href = CONFIG.IMAGE_REPO_LINK;
+
+  // Set once a lookup succeeds, so feedback submissions don't need
+  // to re-ask the customer for their Order ID / phone again.
+  let verified = { orderId: '', phone4: '' };
 
   function escapeHtml(str){
     const d = document.createElement('div');
@@ -35,13 +44,44 @@
 
   function stepsFor(item){
     const placed = true;
-    const couriered = !!item.courieredDate;
+    const couriered = !!item.courierDate;
     const delivered = !!item.deliveredDate;
     return [
-      { label: 'Order Placed', done: placed, date: item.orderDate },
-      { label: 'Couriered', done: couriered, date: item.courieredDate },
-      { label: 'Delivered', done: delivered, date: item.deliveredDate },
+      { label: 'Order Placed', done: placed },
+      { label: 'Couriered', done: couriered },
+      { label: 'Delivered', done: delivered },
     ];
+  }
+
+  function feedbackBlockHtml(it, idx){
+    const hasFeedback = it.feedback && String(it.feedback).trim().length;
+    const currentStars = Number(it.stars) || 0;
+    return `
+    <div class="feedback-given feedback-block" data-row-token="${escapeHtml(it.rowToken)}" data-idx="${idx}">
+      <span class="eyebrow" style="margin-bottom:0.5rem; display:inline-flex;">Your Feedback</span>
+
+      <div class="fb-display" ${hasFeedback ? '' : 'style="display:none;"'}>
+        <div class="stars fb-current-stars">${starMarkup(currentStars)}</div>
+        <p class="fb-current-text" style="font-style:italic; font-family:'Cormorant Garamond', serif; font-size:1.05rem; margin:0.2rem 0 0;">"${escapeHtml(it.feedback)}"</p>
+        <button type="button" class="fb-edit-link">Edit feedback</button>
+      </div>
+
+      <p class="fb-empty-note" style="margin:0.2rem 0 0.8rem; font-size:0.85rem; color:#77817c;" ${hasFeedback ? 'style="display:none;"' : ''}>
+        No feedback recorded yet for this item.
+      </p>
+
+      <form class="fb-form" ${hasFeedback ? 'style="display:none;"' : ''}>
+        <div class="star-picker" data-value="${currentStars}">
+          ${[1,2,3,4,5].map(n => `<button type="button" data-star="${n}" aria-label="${n} star">★</button>`).join('')}
+        </div>
+        <textarea class="fb-text" maxlength="1000" placeholder="How was your saree? Fit, colour, fabric, delivery — anything helps.">${hasFeedback ? escapeHtml(it.feedback) : ''}</textarea>
+        <div class="fb-actions">
+          <button type="submit" class="btn btn-gold fb-submit">Save Feedback</button>
+          <button type="button" class="fb-cancel" ${hasFeedback ? '' : 'style="display:none;"'}>Cancel</button>
+        </div>
+        <p class="fb-note"></p>
+      </form>
+    </div>`;
   }
 
   function renderResults(order, items){
@@ -62,7 +102,6 @@
 
     const cards = items.map((it, i) => {
       const steps = stepsFor(it);
-      const hasFeedback = it.feedback && String(it.feedback).trim().length;
       return `
       <div class="item-card ${i === 0 ? 'active' : ''}" data-idx="${i}">
         <div class="thumb">
@@ -73,7 +112,7 @@
           <h3>${escapeHtml(it.product || 'Saree')}</h3>
           <dl>
             <dt>Quantity</dt><dd>${escapeHtml(it.quantity ?? '1')}</dd>
-            <dt>Couriered</dt><dd>${fmtDate(it.courieredDate)}</dd>
+            <dt>Couriered</dt><dd>${fmtDate(it.courierDate)}</dd>
             <dt>Delivered</dt><dd>${fmtDate(it.deliveredDate)}</dd>
           </dl>
 
@@ -85,15 +124,7 @@
               </div>`).join('')}
           </div>
 
-          ${hasFeedback ? `
-          <div class="feedback-given">
-            <span class="eyebrow" style="margin-bottom:0.5rem; display:inline-flex;">Your Feedback</span>
-            <div class="stars">${starMarkup(it.stars)}</div>
-            <p style="font-style:italic; font-family:'Cormorant Garamond', serif; font-size:1.05rem; margin:0.4rem 0 0;">"${escapeHtml(it.feedback)}"</p>
-          </div>` : `
-          <div class="feedback-given">
-            <p style="margin:0; font-size:0.85rem; color:#77817c;">No feedback recorded yet for this item.</p>
-          </div>`}
+          ${feedbackBlockHtml(it, i)}
         </div>
       </div>`;
     }).join('');
@@ -113,6 +144,103 @@
         tab.classList.add('active');
         resultsBox.querySelector(`.item-card[data-idx="${tab.dataset.idx}"]`).classList.add('active');
       });
+    });
+
+    resultsBox.querySelectorAll('.feedback-block').forEach(wireFeedbackBlock);
+  }
+
+  function wireFeedbackBlock(block){
+    const display = block.querySelector('.fb-display');
+    const emptyNote = block.querySelector('.fb-empty-note');
+    const formEl = block.querySelector('.fb-form');
+    const editLink = block.querySelector('.fb-edit-link');
+    const cancelBtn = block.querySelector('.fb-cancel');
+    const picker = block.querySelector('.star-picker');
+    const stars = picker.querySelectorAll('button');
+    const textEl = block.querySelector('.fb-text');
+    const noteEl = block.querySelector('.fb-note');
+    const rowToken = block.dataset.rowToken;
+
+    function paintStars(){
+      const val = Number(picker.dataset.value) || 0;
+      stars.forEach(btn => btn.classList.toggle('on', Number(btn.dataset.star) <= val));
+    }
+    paintStars();
+
+    stars.forEach(btn => btn.addEventListener('click', () => {
+      picker.dataset.value = btn.dataset.star;
+      paintStars();
+    }));
+
+    function showForm(){
+      display.style.display = 'none';
+      emptyNote.style.display = 'none';
+      formEl.style.display = 'flex';
+    }
+    function showDisplay(feedbackText, starVal){
+      block.querySelector('.fb-current-stars').innerHTML = starMarkup(starVal);
+      block.querySelector('.fb-current-text').textContent = '"' + feedbackText + '"';
+      display.style.display = 'flex';
+      emptyNote.style.display = 'none';
+      formEl.style.display = 'none';
+      editLink.style.display = 'inline-flex';
+    }
+
+    if (editLink) editLink.addEventListener('click', showForm);
+    if (cancelBtn) cancelBtn.addEventListener('click', () => {
+      formEl.style.display = 'none';
+      display.style.display = 'flex';
+    });
+
+    formEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = textEl.value.trim();
+      const starVal = Number(picker.dataset.value) || 0;
+      noteEl.className = 'fb-note';
+
+      if (!text){
+        noteEl.className = 'fb-note show err';
+        noteEl.textContent = 'Please write a short note before saving.';
+        return;
+      }
+      if (!starVal){
+        noteEl.className = 'fb-note show err';
+        noteEl.textContent = 'Please pick a star rating.';
+        return;
+      }
+
+      const submitBtnEl = formEl.querySelector('.fb-submit');
+      submitBtnEl.disabled = true;
+      const originalLabel = submitBtnEl.textContent;
+      submitBtnEl.textContent = 'Saving…';
+
+      try{
+        const res = await callApiPost({
+          action: 'submitFeedback',
+          orderId: verified.orderId,
+          phone4: verified.phone4,
+          rowToken,
+          feedback: text,
+          stars: starVal
+        });
+        if (res && res.success){
+          noteEl.className = 'fb-note show ok';
+          noteEl.textContent = 'Thank you — your feedback has been saved.';
+          setTimeout(() => showDisplay(text, starVal), 500);
+        } else {
+          noteEl.className = 'fb-note show err';
+          noteEl.textContent = 'Couldn\'t save that just now — please try again.';
+        }
+      }catch(err){
+        noteEl.className = 'fb-note show err';
+        noteEl.textContent = err.message === 'CONFIG_MISSING'
+          ? 'Feedback saving isn\'t connected yet.'
+          : 'Something went wrong saving your feedback. Please try again.';
+        console.warn('Feedback submit failed:', err.message);
+      }finally{
+        submitBtnEl.disabled = false;
+        submitBtnEl.textContent = originalLabel;
+      }
     });
   }
 
@@ -139,6 +267,7 @@
         return;
       }
       clearStatus();
+      verified = { orderId, phone4 };
       renderResults(data.order, data.items || []);
     }catch(err){
       if (err.message === 'CONFIG_MISSING'){
