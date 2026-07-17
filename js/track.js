@@ -62,13 +62,11 @@
 
     const cards = items.map((it, i) => {
       const steps = stepsFor(it);
-      const img = resolveImageUrl(it.image || it.product);
       const hasFeedback = it.feedback && String(it.feedback).trim().length;
       return `
       <div class="item-card ${i === 0 ? 'active' : ''}" data-idx="${i}">
         <div class="thumb">
-          <img src="${img}" alt="${escapeHtml(it.product || 'Saree')}" loading="lazy"
-               onerror="this.style.display='none'; this.closest('.thumb').style.background='linear-gradient(135deg,var(--peacock),var(--midnight))';">
+          <img data-img-source="${escapeHtml(it.image || it.product)}" alt="${escapeHtml(it.product || 'Saree')}" loading="lazy">
         </div>
         <div class="info">
           <span class="code">${escapeHtml(order.orderId)}${multi ? ' · Item ' + (i+1) : ''}</span>
@@ -103,6 +101,10 @@
     resultsBox.innerHTML = summary + tabs + cards;
     resultsBox.style.display = 'block';
     resultsBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    resultsBox.querySelectorAll('img[data-img-source]').forEach(img => {
+      setupImageFallback(img, img.dataset.imgSource);
+    });
 
     resultsBox.querySelectorAll('.item-tab').forEach(tab => {
       tab.addEventListener('click', () => {
