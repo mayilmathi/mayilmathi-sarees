@@ -716,6 +716,76 @@ a:focus-visible, button:focus-visible, input:focus-visible{
   margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px dashed rgba(11,59,69,0.15);
 }
 
+/* ---- editable feedback form (track page) ---- */
+.feedback-block .fb-display{ display: flex; flex-direction: column; gap: 0.5rem; }
+.feedback-block .fb-edit-link{
+  align-self: flex-start;
+  font-family: 'Marcellus', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--peacock);
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0.2rem 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.feedback-block .fb-edit-link:hover{ color: var(--gold); }
+
+.star-picker{
+  display: inline-flex;
+  gap: 0.3rem;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.star-picker button{
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: rgba(11,59,69,0.22);
+  transition: transform var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.star-picker button:hover{ transform: scale(1.15); }
+.star-picker button.on{ color: var(--gold); }
+
+.fb-form{ display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.6rem; }
+.fb-form textarea{
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(11,59,69,0.2);
+  font-family: 'Jost', sans-serif;
+  font-size: 0.92rem;
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+}
+.fb-form textarea:focus{ outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px rgba(201,151,62,0.15); }
+.fb-form .fb-actions{ display: flex; gap: 0.7rem; align-items: center; }
+.fb-form .btn{ padding: 0.7rem 1.4rem; font-size: 0.7rem; }
+.fb-cancel{
+  font-family: 'Marcellus', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  color: #77817c;
+  cursor: pointer;
+}
+.fb-cancel:hover{ color: var(--wine); }
+.fb-note{
+  font-size: 0.8rem;
+  margin: 0;
+  display: none;
+}
+.fb-note.show{ display: block; animation: rise var(--dur-fast) var(--ease-silk); }
+.fb-note.ok{ color: var(--emerald); }
+.fb-note.err{ color: var(--wine); }
+
 /* ============================= PRIVACY NOTE ============================= */
 .privacy-note{
   display: flex; gap: 0.9rem; align-items: flex-start;
