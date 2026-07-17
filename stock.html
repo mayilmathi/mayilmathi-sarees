@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Available Stock — Mayilmathi Sarees</title>
+<meta name="description" content="See exactly what's in stock at Mayilmathi Sarees right now, pulled live from our records.">
+<link rel="icon" href="images/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="brand">
+      <img src="images/logo.png" alt="Mayilmathi Sarees logo">
+      <span class="brand-text"><span class="name">Mayilmathi</span><span class="tag">Sarees</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About Us</a></li>
+      <li><a href="stock.html" class="active">Available Stock</a></li>
+      <li><a href="index.html#feedback">Feedback</a></li>
+      <li><a href="track.html">Track My Order</a></li>
+    </ul>
+    <a href="track.html" class="nav-cta">Track My Order</a>
+    <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<section class="hero" style="padding: 3.4rem 0 3rem;">
+  <div class="container">
+    <span class="badge-new"><span class="dot"></span>Updated Live From Our Records</span>
+    <h1 style="font-size: clamp(2.2rem, 4.4vw, 3.4rem);">What's on the shelf<br><em>today.</em></h1>
+    <p class="lede">Because we're a new, small label, this list is short on purpose. Once a saree code sells out, it's gone until we bring in something new — so what you see here is the real count, not a wishlist.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 2.6rem;">
+  <div class="container">
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by saree code…" aria-label="Search saree code">
+      </div>
+      <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+        <button class="filter-chip active" data-filter="all">All</button>
+        <button class="filter-chip" data-filter="in">In Stock</button>
+        <button class="filter-chip" data-filter="low">Low Stock</button>
+      </div>
+    </div>
+
+    <div class="stock-grid" id="stockGrid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      <p>No sarees match that search right now.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><img src="images/logo.png" alt="Mayilmathi Sarees"><span>Mayilmathi Sarees</span></div>
+        <p style="max-width:36ch;">A new house of handpicked silk sarees. Small batches, honest tracking, and a promise that your details stay yours.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="index.html#about">About Us</a></li>
+          <li><a href="stock.html">Available Stock</a></li>
+          <li><a href="track.html">Track My Order</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Photos</h4>
+        <ul><li><a href="#" id="repoLink" target="_blank" rel="noopener">Saree Photos on GitHub ↗</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span class="year"></span> Mayilmathi Sarees. All sarees, all rights.</span>
+      <span>Hosted with care on GitHub Pages.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/stock.js"></script>
+</body>
+</html>

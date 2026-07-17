@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track My Order — Mayilmathi Sarees</title>
+<meta name="description" content="Enter your Order ID and mobile number to privately view your Mayilmathi Sarees order status.">
+<link rel="icon" href="images/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="brand">
+      <img src="images/logo.png" alt="Mayilmathi Sarees logo">
+      <span class="brand-text"><span class="name">Mayilmathi</span><span class="tag">Sarees</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About Us</a></li>
+      <li><a href="stock.html">Available Stock</a></li>
+      <li><a href="index.html#feedback">Feedback</a></li>
+      <li><a href="track.html" class="active">Track My Order</a></li>
+    </ul>
+    <a href="stock.html" class="nav-cta">View Collection</a>
+    <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<section class="hero" style="padding: 3.4rem 0 4.5rem;">
+  <div class="container" style="text-align:center;">
+    <span class="badge-new" style="margin-inline:auto;"><span class="dot"></span>Private &amp; Order-Specific</span>
+    <h1 style="font-size: clamp(2.2rem, 4.4vw, 3.4rem);">Where's my saree?</h1>
+    <p class="lede" style="margin-inline:auto;">Enter your Order ID along with the last 4 digits of the mobile number used to order. Only the exact match is ever shown — no one else's order, ever.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 0; margin-top: -2.6rem;">
+  <div class="container">
+    <div class="track-panel reveal in">
+      <div class="arch" data-feather-divider></div>
+      <span class="eyebrow" style="justify-content:center; display:flex; margin-bottom:1.2rem;">Verify &amp; View</span>
+      <form id="trackForm" autocomplete="off">
+        <div class="field-row">
+          <div class="field">
+            <label for="orderId">Order ID</label>
+            <input type="text" id="orderId" name="orderId" placeholder="e.g. MMS-1042" required>
+          </div>
+          <div class="field">
+            <label for="phone4">Last 4 Digits of Mobile</label>
+            <input type="text" id="phone4" name="phone4" placeholder="e.g. 4821" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required>
+          </div>
+        </div>
+        <p class="field-hint">Both the Order ID and mobile digits must match — this keeps your order visible only to you.</p>
+        <button type="submit" class="btn btn-gold" id="trackSubmit">Show My Order</button>
+      </form>
+
+      <div class="track-status" id="trackStatus"></div>
+
+      <div class="privacy-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span>We never show a customer list, search box, or "browse all orders" feature anywhere on this site. Your order details are retrieved only when both fields you enter match exactly.</span>
+      </div>
+    </div>
+
+    <div class="order-results" id="orderResults" style="display:none;"></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><img src="images/logo.png" alt="Mayilmathi Sarees"><span>Mayilmathi Sarees</span></div>
+        <p style="max-width:36ch;">A new house of handpicked silk sarees. Small batches, honest tracking, and a promise that your details stay yours.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="index.html#about">About Us</a></li>
+          <li><a href="stock.html">Available Stock</a></li>
+          <li><a href="track.html">Track My Order</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Photos</h4>
+        <ul><li><a href="#" id="repoLink" target="_blank" rel="noopener">Saree Photos on GitHub ↗</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span class="year"></span> Mayilmathi Sarees. All sarees, all rights.</span>
+      <span>Hosted with care on GitHub Pages.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/track.js"></script>
+</body>
+</html>
