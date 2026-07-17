@@ -13,7 +13,7 @@ const CONFIG = {
   API_URL: "https://script.google.com/macros/s/AKfycbyxjnTwZxXRNQctuRvvmVQMw6rYrOXcS42We_yeDvScFLRwrbTaCl2fZbzDcft4wyyS/exec",
 
   // Where saree photos are hosted on GitHub (raw file base URL, trailing slash)
-  IMAGE_BASE_URL: "https://raw.githubusercontent.com/USERNAME/REPO/main/images/sarees/",
+  IMAGE_BASE_URL: "https://raw.githubusercontent.com/mayilmathi/mayilmathi-sarees/main/images/sarees/",
 
   // Public link to your GitHub repo image folder (shown as a "view all photos" link)
   IMAGE_REPO_LINK: "https://github.com/USERNAME/REPO/tree/main/images/sarees"
